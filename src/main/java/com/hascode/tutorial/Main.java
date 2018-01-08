@@ -1,8 +1,9 @@
 package com.hascode.tutorial;
 
 import java.time.LocalDate;
-import rx.Observable;
-import rx.Subscriber;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+import reactor.core.publisher.Flux;
 
 public class Main {
 
@@ -30,27 +31,17 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    Observable.just(News.create("Important news"), News.create("Some other news"),
+    Flux.just(News.create("Important news"), News.create("Some other news"),
         News.create("And news, news, news")).subscribe(new Subscriber<News>() {
-
       private static final int MAX_NEWS = 3;
       private int newsReceived = 0;
+      private Subscription subscription;
 
       @Override
-      public void onStart() {
-        System.out.println("new subscription");
-        request(1);
-      }
-
-      @Override
-      public void onCompleted() {
-        System.out.println("fetching news completed");
-      }
-
-      @Override
-      public void onError(Throwable throwable) {
-        System.err.printf("error occurred fetching news: %s\n", throwable.getMessage());
-        throwable.printStackTrace(System.err);
+      public void onSubscribe(Subscription subscription) {
+        System.out.printf("new subscription %s\n", subscription);
+        this.subscription = subscription;
+        subscription.request(1);
       }
 
       @Override
@@ -60,13 +51,24 @@ public class Main {
         if (newsReceived >= MAX_NEWS) {
           System.out.printf("%d news received (max: %d), cancelling subscription\n", newsReceived,
               MAX_NEWS);
-          unsubscribe();
+          subscription.cancel();
           return;
         }
 
-        request(1);
+        subscription.request(1);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        System.err.printf("error occurred fetching news: %s\n", throwable.getMessage());
+        throwable.printStackTrace(System.err);
+
+      }
+
+      @Override
+      public void onComplete() {
+        System.out.println("fetching news completed");
       }
     });
-
   }
 }
