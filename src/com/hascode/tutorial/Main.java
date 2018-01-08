@@ -49,7 +49,8 @@ public class Main {
       System.out.printf("news received: %s (%s)\n", item.getHeadline(), item.getDate());
       newsReceived++;
       if (newsReceived >= MAX_NEWS) {
-        System.out.printf("%d news received (max: %d), cancelling subscription\n", newsReceived, MAX_NEWS);
+        System.out.printf("%d news received (max: %d), cancelling subscription\n", newsReceived,
+            MAX_NEWS);
         subscription.cancel();
         return;
       }
@@ -73,7 +74,7 @@ public class Main {
 
 
   public static void main(String[] args) {
-    try (SubmissionPublisher<News> newsPublisher   = new SubmissionPublisher()) {
+    try (SubmissionPublisher<News> newsPublisher = new SubmissionPublisher()) {
 
       NewsSubscriber newsSubscriber = new NewsSubscriber();
       newsPublisher.subscribe(newsSubscriber);
@@ -81,7 +82,7 @@ public class Main {
       List.of(News.create("Important news"), News.create("Some other news"),
           News.create("And news, news, news")).forEach(newsPublisher::submit);
 
-      while(newsPublisher.hasSubscribers()){
+      while (newsPublisher.hasSubscribers()) {
         // wait
       }
       System.out.println("no more news subscribers left, closing publisher..");
