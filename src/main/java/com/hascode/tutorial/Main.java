@@ -1,11 +1,15 @@
 package com.hascode.tutorial;
 
-import akka.NotUsed;
-import akka.stream.javadsl.Flow;
+import akka.actor.ActorSystem;
+import akka.stream.ActorMaterializer;
+import akka.stream.Materializer;
+import akka.stream.javadsl.AsPublisher;
+import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableSubscriber;
 import java.time.LocalDate;
+import java.util.List;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 
 public class Main {
 
@@ -33,11 +37,15 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    //TODO:
-    Source<News, NotUsed> newsSource = Source.empty();
-    /*
-    Flowable.just(News.create("Important news"), News.create("Some other news"),
-        News.create("And news, news, news")).subscribe(new FlowableSubscriber<>() {
+    final ActorSystem system = ActorSystem.create("sample-system");
+    final Materializer materializer = ActorMaterializer.create(system);
+
+    final Publisher<News> publisher =
+        Source.from(List.of(News.create("Important news"), News.create("Some other news"),
+            News.create("And news, news, news")))
+            .runWith(Sink.asPublisher(AsPublisher.WITH_FANOUT), materializer);
+
+    Subscriber<News> newsSubscriber = new Subscriber<>() {
       private org.reactivestreams.Subscription subscription;
       private static final int MAX_NEWS = 3;
       private int newsReceived = 0;
@@ -73,7 +81,8 @@ public class Main {
       public void onComplete() {
         System.out.println("fetching news completed");
       }
-    });
-    */
+    };
+
+    publisher.subscribe(newsSubscriber);
   }
 }
