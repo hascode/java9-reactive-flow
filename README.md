@@ -14,6 +14,12 @@ git checkout master
 git checkout rxjava2
 ```
 
+## Akka
+
+```bash
+git checkout akka
+```
+
 ## Reactor
 
 ```bash
