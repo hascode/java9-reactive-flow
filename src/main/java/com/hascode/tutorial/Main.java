@@ -1,5 +1,8 @@
 package com.hascode.tutorial;
 
+import akka.NotUsed;
+import akka.stream.javadsl.Flow;
+import akka.stream.javadsl.Source;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableSubscriber;
 import java.time.LocalDate;
@@ -30,6 +33,9 @@ public class Main {
   }
 
   public static void main(String[] args) {
+    //TODO:
+    Source<News, NotUsed> newsSource = Source.empty();
+    /*
     Flowable.just(News.create("Important news"), News.create("Some other news"),
         News.create("And news, news, news")).subscribe(new FlowableSubscriber<>() {
       private org.reactivestreams.Subscription subscription;
@@ -68,5 +74,6 @@ public class Main {
         System.out.println("fetching news completed");
       }
     });
+    */
   }
 }
